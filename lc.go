@@ -4,27 +4,45 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/urfave/cli"
 )
 
-func parseArgs(c *cli.Context) {
-}
+func getFiles(folderPath string) []string {
+	fileList := make([]string, 0)
+	err := filepath.Walk(folderPath, func(path string, f os.FileInfo, err error) error {
+		if !f.IsDir() {
+			fileList = append(fileList, path)
+		}
+		return err
+	})
 
-func countLines() {
-}
-
-func countLinesInFile() {
+	if err != nil {
+		log.Fatal(err)
+	}
+	return fileList
 }
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "code line counter"
-	app.Usage = "lc <folder/file>"
 
 	app.Action = func(c *cli.Context) error {
-		// TODO: Add https://github.com/derekparker/delve to debug
-		fmt.Printf("Hello %q", c.Args().Get(0))
+		path := c.Args().First()
+		fi, err := os.Stat(path)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var files []string
+		switch mode := fi.Mode(); {
+		case mode.IsDir():
+			files = append(files, getFiles(path)...)
+		case mode.IsRegular():
+			files = append(files, path)
+		}
+		fmt.Printf("files: %q", files)
 		return nil
 	}
 

@@ -1,13 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/urfave/cli"
 )
+
+var supportedFileTypes = [2]string{"py", "go"}
 
 func getFiles(folderPath string) []string {
 	fileList := make([]string, 0)
@@ -42,7 +43,10 @@ func main() {
 		case mode.IsRegular():
 			files = append(files, path)
 		}
-		fmt.Printf("files: %q", files)
+
+		for _, f := range files {
+		}
+
 		return nil
 	}
 
